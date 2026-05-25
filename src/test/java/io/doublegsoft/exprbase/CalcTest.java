@@ -7,7 +7,7 @@ import org.junit.Test;
 public class CalcTest extends TestBase {
 
   @Test
-  public void test_calc_expr_1() throws Exception {
+  public void test_calc_expr_add() throws Exception {
     Exprbase parser = newExprbase();
     String expr = "a + b / d * 3";
     CalculationDefinition calc = parser.parseCalculation(expr);
@@ -17,7 +17,7 @@ public class CalcTest extends TestBase {
   }
 
   @Test
-  public void test_calc_expr_2() throws Exception {
+  public void test_calc_expr_paren_add() throws Exception {
     Exprbase parser = newExprbase();
     String expr = "(a + b) / d * 3";
     CalculationDefinition calc = parser.parseCalculation(expr);
