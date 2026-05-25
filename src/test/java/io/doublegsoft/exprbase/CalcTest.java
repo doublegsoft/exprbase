@@ -27,6 +27,4 @@ public class CalcTest extends TestBase {
         .getValue().getVariable().getName());
   }
 
-
-
 }
