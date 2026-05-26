@@ -57,7 +57,6 @@ public class Exprbase {
       cmp.setComparator(ctx.exprbase_comparator().getText());
       String comparand = ctx.comparand.getText();
       VariableDefinition var = createVariable(comparand, usecase);
-      var.setName(comparand);
       cmp.setComparand(var);
       ValueDefinition value = new ValueDefinition();
       parseValue(ctx.value, value, usecase);
