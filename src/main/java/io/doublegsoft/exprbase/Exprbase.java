@@ -56,7 +56,7 @@ public class Exprbase {
     if (ctx.exprbase_comparator() != null) {
       cmp.setComparator(ctx.exprbase_comparator().getText());
       String comparand = ctx.comparand.getText();
-      VariableDefinition var = new VariableDefinition();
+      VariableDefinition var = createVariable(comparand, usecase);
       var.setName(comparand);
       cmp.setComparand(var);
       ValueDefinition value = new ValueDefinition();
@@ -118,30 +118,8 @@ public class Exprbase {
         value.setKeyword(str);
       } else if ("true".equals(str) || "false".equals(str)){
         value.setBool(str);
-      } else if (str.contains(".") && DUMMY != usecase) {
-        String[] strs = str.split("\\.");
-        VariableDefinition var = usecase.getVariable(strs[0]);
-        if (var == null) {
-          var = new VariableDefinition();
-          var.setName(str);
-        } else {
-          ObjectDefinition obj = dataModel.findObjectByName(strs[0]);
-          if (obj != null) {
-            AttributeDefinition attr = obj.getAttribute(strs[1]);
-            var.setType(attr.getType());
-          }
-        }
-        value.setVariable(var);
-      } else if (DUMMY != usecase){
-        VariableDefinition var = usecase.getVariable(str);
-        if (var == null) {
-          var = new VariableDefinition();
-          var.setName(str);
-        }
-        value.setVariable(var);
       } else {
-        VariableDefinition var = new VariableDefinition();
-        var.setName(str);
+        VariableDefinition var = createVariable(str, usecase);
         value.setVariable(var);
       }
     } else if (ctx.anybase_number() != null) {
@@ -149,4 +127,32 @@ public class Exprbase {
     }
   }
 
+  private VariableDefinition createVariable(String varname, UsecaseDefinition usecase) {
+    if (varname.contains(".") && DUMMY != usecase) {
+      String[] strs = varname.split("\\.");
+      VariableDefinition var = usecase.getVariable(strs[0]);
+      if (var == null) {
+        var = new VariableDefinition();
+        var.setName(varname);
+      } else {
+        ObjectDefinition obj = dataModel.findObjectByName(strs[0]);
+        if (obj != null) {
+          AttributeDefinition attr = obj.getAttribute(strs[1]);
+          var.setType(attr.getType());
+        }
+      }
+      return var;
+    } else if (DUMMY != usecase){
+      VariableDefinition var = usecase.getVariable(varname);
+      if (var == null) {
+        var = new VariableDefinition();
+        var.setName(varname);
+      }
+      return var;
+    } else {
+      VariableDefinition var = new VariableDefinition();
+      var.setName(varname);
+      return var;
+    }
+  }
 }
