@@ -133,13 +133,9 @@ public class Exprbase {
       VariableDefinition var = usecase.getVariable(strs[0]);
       if (var == null) {
         var = new VariableDefinition();
-        var.setName(varname);
-      } else {
         ObjectDefinition obj = dataModel.findObjectByName(strs[0]);
-        if (obj != null) {
-          AttributeDefinition attr = obj.getAttribute(strs[1]);
-          var.setType(attr.getType());
-        }
+        var.setName(strs[0]);
+        var.setType(obj);
       }
       return var;
     } else if (DUMMY != usecase){
