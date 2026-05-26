@@ -3,9 +3,13 @@ package io.doublegsoft.exprbase.parser;
 import com.doublegsoft.jcommons.metabean.AttributeDefinition;
 import com.doublegsoft.jcommons.metabean.ModelDefinition;
 import com.doublegsoft.jcommons.metabean.ObjectDefinition;
+import com.doublegsoft.jcommons.metamodel.ComparisonDefinition;
 import com.doublegsoft.jcommons.metamodel.UsecaseDefinition;
 import com.doublegsoft.jcommons.metamodel.ValueDefinition;
 import com.doublegsoft.jcommons.metamodel.VariableDefinition;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.math.BigDecimal;
 
@@ -51,5 +55,14 @@ public class ValueParser {
     } else if (ctx.anybase_number() != null) {
       value.setNumber(new BigDecimal(ctx.anybase_number().getText()));
     }
+  }
+
+  public void assemble(String originalText,
+                       ValueDefinition value, UsecaseDefinition usecase) {
+    CharStream input = CharStreams.fromString(originalText);
+    io.doublegsoft.exprbase.ExprbaseLexer lexer = new io.doublegsoft.exprbase.ExprbaseLexer(input);
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    io.doublegsoft.exprbase.ExprbaseParser parser = new io.doublegsoft.exprbase.ExprbaseParser(tokens);
+    assemble(parser.anybase_value(), value, usecase);
   }
 }
