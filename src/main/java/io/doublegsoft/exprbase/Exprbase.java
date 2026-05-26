@@ -54,11 +54,11 @@ public class Exprbase {
   private void parseCmpExpr(io.doublegsoft.exprbase.ExprbaseParser.Exprbase_cmp_exprContext ctx,
                             ComparisonDefinition cmp, UsecaseDefinition usecase) {
     if (ctx.exprbase_comparator() != null) {
+      ValueDefinition value = new ValueDefinition();
       cmp.setComparator(ctx.exprbase_comparator().getText());
       String comparand = ctx.comparand.getText();
-      VariableDefinition var = createVariable(comparand, usecase);
+      VariableDefinition var = parseVariable(comparand, value, usecase);
       cmp.setComparand(var);
-      ValueDefinition value = new ValueDefinition();
       parseValue(ctx.value, value, usecase);
       cmp.setValue(value);
     } else if (ctx.paren != null) {
@@ -118,7 +118,7 @@ public class Exprbase {
       } else if ("true".equals(str) || "false".equals(str)){
         value.setBool(str);
       } else {
-        VariableDefinition var = createVariable(str, usecase);
+        VariableDefinition var = parseVariable(str, value, usecase);
         value.setVariable(var);
       }
     } else if (ctx.anybase_number() != null) {
@@ -126,7 +126,7 @@ public class Exprbase {
     }
   }
 
-  private VariableDefinition createVariable(String varname, UsecaseDefinition usecase) {
+  private VariableDefinition parseVariable(String varname, ValueDefinition value, UsecaseDefinition usecase) {
     if (varname.contains(".") && DUMMY != usecase) {
       String[] strs = varname.split("\\.");
       VariableDefinition var = usecase.getVariable(strs[0]);
@@ -136,6 +136,12 @@ public class Exprbase {
         var.setName(strs[0]);
         var.setType(obj);
       }
+      if (value != null) {
+        ObjectDefinition obj = (ObjectDefinition) var.getType();
+        AttributeDefinition attr = obj.getAttribute(strs[1]);
+        value.setAttributeValue(attr);
+        value.setVariable(var);
+      }
       return var;
     } else if (DUMMY != usecase){
       VariableDefinition var = usecase.getVariable(varname);
@@ -143,10 +149,12 @@ public class Exprbase {
         var = new VariableDefinition();
         var.setName(varname);
       }
+      value.setVariable(var);
       return var;
     } else {
       VariableDefinition var = new VariableDefinition();
       var.setName(varname);
+      value.setVariable(var);
       return var;
     }
   }
