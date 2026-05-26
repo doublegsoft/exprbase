@@ -3,6 +3,7 @@ package io.doublegsoft.exprbase;
 import com.doublegsoft.jcommons.metabean.AttributeDefinition;
 import com.doublegsoft.jcommons.metabean.ModelDefinition;
 import com.doublegsoft.jcommons.metabean.ObjectDefinition;
+import com.doublegsoft.jcommons.metabean.type.CollectionType;
 import com.doublegsoft.jcommons.metamodel.*;
 import io.doublegsoft.exprbase.parser.ValueParser;
 import org.antlr.v4.runtime.CharStream;
@@ -137,7 +138,13 @@ public class Exprbase {
         var.setType(obj);
       }
       if (value != null) {
-        ObjectDefinition obj = (ObjectDefinition) var.getType();
+        ObjectDefinition obj = null;
+        if (var.getType().isCollection()) {
+          CollectionType collType = (CollectionType) var.getType();
+          obj = dataModel.findObjectByName(collType.getComponentType().getName());
+        } else {
+          obj = (ObjectDefinition) var.getType();
+        }
         AttributeDefinition attr = obj.getAttribute(strs[1]);
         value.setAttributeValue(attr);
         value.setVariable(var);
