@@ -1,15 +1,16 @@
 package io.doublegsoft.exprbase;
 
 import com.doublegsoft.jcommons.metabean.ModelDefinition;
-import com.doublegsoft.jcommons.metamodel.*;
-import io.doublegsoft.usebase.parser.ValueParser;
+import com.doublegsoft.jcommons.metamodel.CalculationDefinition;
+import com.doublegsoft.jcommons.metamodel.ComparisonDefinition;
+import com.doublegsoft.jcommons.metamodel.ValueDefinition;
+import com.doublegsoft.jcommons.metamodel.VariableDefinition;
+import io.doublegsoft.exprbase.parser.ValueParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Exprbase {
 
@@ -36,21 +37,14 @@ public class Exprbase {
     io.doublegsoft.exprbase.ExprbaseLexer lexer = new io.doublegsoft.exprbase.ExprbaseLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     io.doublegsoft.exprbase.ExprbaseParser parser = new io.doublegsoft.exprbase.ExprbaseParser(tokens);
-    return parseCmpExpr(parser.exprbase_cmp_expr());
-  }
-
-  private ComparisonDefinition parseCmpExpr(io.doublegsoft.exprbase.ExprbaseParser.Exprbase_cmp_exprContext ctx) {
     ComparisonDefinition retVal = new ComparisonDefinition();
-    if (ctx.msg != null) {
-      String msg = ctx.msg.getText();
-      retVal.setError(msg.substring(0, msg.length() - 1));
-    }
-    parseCmp(ctx.exprbase_cmp(), retVal);
+    parseCmpExpr(parser.exprbase_cmp_expr(), retVal);
     return retVal;
   }
 
-  private void parseCmp(io.doublegsoft.exprbase.ExprbaseParser.Exprbase_cmpContext ctx,
-                        ComparisonDefinition cmp) {
+  private void parseCmpExpr(io.doublegsoft.exprbase.ExprbaseParser.Exprbase_cmp_exprContext ctx,
+                            ComparisonDefinition cmp) {
+    ComparisonDefinition retVal = new ComparisonDefinition();
     if (ctx.exprbase_comparator() != null) {
       cmp.setComparator(ctx.exprbase_comparator().getText());
       String comparand = ctx.comparand.getText();
@@ -61,19 +55,19 @@ public class Exprbase {
       parseValue(ctx.value, value);
       cmp.setValue(value);
     } else if (ctx.paren != null) {
-      parseCmp(ctx.exprbase_cmp(0), cmp);
+      parseCmpExpr(ctx.exprbase_cmp_expr(0), cmp);
     } else if (ctx.and != null) {
       ComparisonDefinition lhs = new ComparisonDefinition();
-      parseCmp(ctx.exprbase_cmp(0), lhs);
+      parseCmpExpr(ctx.exprbase_cmp_expr(0), lhs);
       ComparisonDefinition rhs = new ComparisonDefinition();
-      parseCmp(ctx.exprbase_cmp(1), rhs);
+      parseCmpExpr(ctx.exprbase_cmp_expr(1), rhs);
       cmp.getAndComparisons().add(lhs);
       cmp.getAndComparisons().add(rhs);
     } else if (ctx.or != null) {
       ComparisonDefinition lhs = new ComparisonDefinition();
-      parseCmp(ctx.exprbase_cmp(0), lhs);
+      parseCmpExpr(ctx.exprbase_cmp_expr(0), lhs);
       ComparisonDefinition rhs = new ComparisonDefinition();
-      parseCmp(ctx.exprbase_cmp(1), rhs);
+      parseCmpExpr(ctx.exprbase_cmp_expr(1), rhs);
       cmp.getOrComparisons().add(lhs);
       cmp.getOrComparisons().add(rhs);
     }
