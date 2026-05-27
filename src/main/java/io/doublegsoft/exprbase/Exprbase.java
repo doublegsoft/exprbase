@@ -9,6 +9,8 @@ import io.doublegsoft.exprbase.parser.ValueParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
 
 import java.math.BigDecimal;
 
@@ -62,6 +64,7 @@ public class Exprbase {
       cmp.setComparand(var);
       parseValue(ctx.value, value, usecase);
       cmp.setValue(value);
+      cmp.setOriginalText(getOriginalText(ctx));
     } else if (ctx.paren != null) {
       parseCmpExpr(ctx.exprbase_cmp_expr(0), cmp, usecase);
     } else if (ctx.and != null) {
@@ -71,6 +74,8 @@ public class Exprbase {
       parseCmpExpr(ctx.exprbase_cmp_expr(1), rhs, usecase);
       cmp.getAndComparisons().add(lhs);
       cmp.getAndComparisons().add(rhs);
+      lhs.setOriginalText(getOriginalText(ctx.exprbase_cmp_expr(0)));
+      rhs.setOriginalText(getOriginalText(ctx.exprbase_cmp_expr(1)));
     } else if (ctx.or != null) {
       ComparisonDefinition lhs = new ComparisonDefinition();
       parseCmpExpr(ctx.exprbase_cmp_expr(0), lhs, usecase);
@@ -78,6 +83,8 @@ public class Exprbase {
       parseCmpExpr(ctx.exprbase_cmp_expr(1), rhs, usecase);
       cmp.getOrComparisons().add(lhs);
       cmp.getOrComparisons().add(rhs);
+      lhs.setOriginalText(getOriginalText(ctx.exprbase_cmp_expr(0)));
+      rhs.setOriginalText(getOriginalText(ctx.exprbase_cmp_expr(1)));
     }
   }
 
@@ -87,6 +94,7 @@ public class Exprbase {
       ValueDefinition value = new ValueDefinition();
       parseValue(ctx.exprbase_calc_value().anybase_value(), value, usecase);
       calc.setValue(value);
+      value.setOriginalText(getOriginalText(ctx.exprbase_calc_value()));
     } else if (ctx.left != null) {
       calc.setOperator(ctx.operator.getText());
       CalculationDefinition lhs = new CalculationDefinition();
@@ -95,6 +103,8 @@ public class Exprbase {
       CalculationDefinition rhs = new CalculationDefinition();
       parseCalcExpr(ctx.right, rhs, usecase);
       calc.setRightOperand(rhs);
+      lhs.setOriginalText(getOriginalText(ctx.left));
+      rhs.setOriginalText(getOriginalText(ctx.right));
     } else if (ctx.paren != null) {
       parseCalcExpr(ctx.exprbase_calc_expr(0), calc, usecase);
     }
@@ -164,5 +174,10 @@ public class Exprbase {
       value.setVariable(var);
       return var;
     }
+  }
+
+  public static String getOriginalText(ParserRuleContext ctx) {
+    Interval intv = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex());
+    return ctx.start.getInputStream().getText(intv);
   }
 }
