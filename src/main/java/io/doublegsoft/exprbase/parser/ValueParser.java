@@ -3,6 +3,7 @@ package io.doublegsoft.exprbase.parser;
 import com.doublegsoft.jcommons.metabean.AttributeDefinition;
 import com.doublegsoft.jcommons.metabean.ModelDefinition;
 import com.doublegsoft.jcommons.metabean.ObjectDefinition;
+import com.doublegsoft.jcommons.metabean.type.CollectionType;
 import com.doublegsoft.jcommons.metamodel.ComparisonDefinition;
 import com.doublegsoft.jcommons.metamodel.UsecaseDefinition;
 import com.doublegsoft.jcommons.metamodel.ValueDefinition;
@@ -42,6 +43,15 @@ public class ValueParser {
             value.setAttributeValue(attr);
           } else {
             value.setVariable(var);
+            ObjectDefinition obj = null;
+            if (var.getType().isCollection()) {
+              CollectionType collType = (CollectionType) var.getType();
+              obj = dataModel.findObjectByName(collType.getComponentType().getName());
+            } else {
+              obj = dataModel.findObjectByName(var.getType().getName());
+            }
+            AttributeDefinition attr = obj.getAttribute(strs[1]);
+            value.setAttributeValue(attr);
           }
         } else {
           VariableDefinition var = usecase.getVariable(str);
