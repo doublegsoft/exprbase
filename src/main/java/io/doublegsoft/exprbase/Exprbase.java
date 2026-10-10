@@ -170,6 +170,10 @@ public class Exprbase {
       return var;
     } else {
       VariableDefinition var = new VariableDefinition();
+      ObjectDefinition obj = dataModel.findObjectByName(varname);
+      if (obj != null) {
+        var.setType(obj);
+      }
       var.setName(varname);
       value.setVariable(var);
       return var;
