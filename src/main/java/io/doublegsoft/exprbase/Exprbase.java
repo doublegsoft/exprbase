@@ -140,13 +140,7 @@ public class Exprbase {
   private VariableDefinition parseVariable(String varname, ValueDefinition value, UsecaseDefinition usecase) {
     if (varname.contains(".") && DUMMY != usecase) {
       String[] strs = varname.split("\\.");
-      VariableDefinition var = usecase.getVariable(strs[0]);
-      if (var == null) {
-        var = new VariableDefinition();
-        ObjectDefinition obj = dataModel.findObjectByName(strs[0]);
-        var.setName(strs[0]);
-        var.setType(obj);
-      }
+      VariableDefinition var = usecase.getVariable(varname);
       if (value != null) {
         ObjectDefinition obj = null;
         if (var.getType().isCollection()) {
