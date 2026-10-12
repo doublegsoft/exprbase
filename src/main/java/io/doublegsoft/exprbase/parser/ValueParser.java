@@ -63,7 +63,11 @@ public class ValueParser {
         }
       }
     } else if (ctx.anybase_number() != null) {
-      value.setNumber(new BigDecimal(ctx.anybase_number().getText()));
+      if (ctx.anybase_number().getText().contains(".")) {
+        value.setNumber(new BigDecimal(ctx.anybase_number().getText()));
+      } else {
+        value.setNumber(Integer.valueOf(ctx.anybase_number().getText()));
+      }
     }
   }
 
