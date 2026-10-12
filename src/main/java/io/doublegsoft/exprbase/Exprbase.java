@@ -60,7 +60,7 @@ public class Exprbase {
       ValueDefinition value = new ValueDefinition();
       cmp.setComparator(ctx.exprbase_comparator().getText());
       String comparand = ctx.comparand.getText();
-      VariableDefinition var = parseVariable(comparand, value, usecase);
+      VariableDefinition var = parseVariable(comparand, null, usecase);
       cmp.setComparand(var);
       parseValue(ctx.value, value, usecase);
       cmp.setValue(value);
@@ -139,9 +139,9 @@ public class Exprbase {
 
   private VariableDefinition parseVariable(String varname, ValueDefinition value, UsecaseDefinition usecase) {
     if (varname.contains(".") && DUMMY != usecase) {
-      String[] strs = varname.split("\\.");
       VariableDefinition var = usecase.getVariable(varname);
       if (value != null) {
+        String[] strs = varname.split("\\.");
         ObjectDefinition obj = null;
         if (var.getType().isCollection()) {
           CollectionType collType = (CollectionType) var.getType();
@@ -160,7 +160,9 @@ public class Exprbase {
         var = new VariableDefinition();
         var.setName(varname);
       }
-      value.setVariable(var);
+      if (value != null) {
+        value.setVariable(var);
+      }
       return var;
     } else {
       VariableDefinition var = new VariableDefinition();
@@ -169,7 +171,9 @@ public class Exprbase {
         var.setType(obj);
       }
       var.setName(varname);
-      value.setVariable(var);
+      if (value != null) {
+        value.setVariable(var);
+      }
       return var;
     }
   }
