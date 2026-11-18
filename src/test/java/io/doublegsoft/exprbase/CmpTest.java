@@ -24,7 +24,9 @@ public class CmpTest extends TestBase {
     String expr = "a > 100 and b > 200";
     ComparisonDefinition cmp = parser.parseComparison(expr);
     Assert.assertEquals("a", cmp.getAndComparisons().get(0).getComparand().getName());
+    Assert.assertEquals(100, cmp.getAndComparisons().get(0).getValue().getNumber().intValue());
     Assert.assertEquals("b", cmp.getAndComparisons().get(1).getComparand().getName());
+    Assert.assertEquals(200, cmp.getAndComparisons().get(1).getValue().getNumber().intValue());
   }
 
   @Test

@@ -146,12 +146,14 @@ public class Exprbase {
         if (var.getType().isCollection()) {
           CollectionType collType = (CollectionType) var.getType();
           obj = dataModel.findObjectByName(collType.getComponentType().getName());
-        } else {
+        } else if (var.getType() instanceof ObjectDefinition) {
           obj = (ObjectDefinition) var.getType();
         }
-        AttributeDefinition attr = obj.getAttribute(strs[1]);
-        value.setAttributeValue(attr);
-        value.setVariable(var);
+        if (obj != null) {
+          AttributeDefinition attr = obj.getAttribute(strs[1]);
+          value.setAttributeValue(attr);
+          value.setVariable(var);
+        }
       }
       return var;
     } else if (DUMMY != usecase){
